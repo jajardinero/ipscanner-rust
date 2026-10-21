@@ -1,0 +1,77 @@
+# Maintainer: Jerome Jardinero <jerome@forestack.tech>
+
+pkgname=netscan-git
+_name=netscan
+pkgver=0.1.0.r1.gbcfd2ea
+pkgrel=1
+pkgdesc='Fast LAN scanner with a desktop GUI: finds hosts, names, vendors, MACs and open services'
+arch=('x86_64' 'aarch64')
+url='https://github.com/jajardinero/ipscanner-rust'
+license=('unknown')
+# winit and glow load the windowing and GL libraries at runtime.
+depends=(
+  'gcc-libs'
+  'glibc'
+  'hicolor-icon-theme'
+  'iputils'
+  'libglvnd'
+  'libxkbcommon'
+  'wayland'
+)
+makedepends=('cargo' 'git')
+optdepends=(
+  'xdg-utils: open web pages, SMB and FTP shares'
+  'gvfs-smb: browse SMB shares in the file manager'
+  'xdg-desktop-portal: save dialog for CSV export'
+  'xdg-terminal-exec: open SSH and Telnet sessions in your terminal'
+  'freerdp: open RDP sessions'
+  'remmina: open RDP and VNC sessions'
+  'tigervnc: open VNC sessions'
+  'inetutils: telnet client'
+  'libx11: run under X11'
+  'libxcursor: run under X11'
+  'libxi: run under X11'
+  'libxrandr: run under X11'
+)
+provides=("$_name")
+conflicts=("$_name")
+# Cargo already strips the release binary, so a -debug package would be empty.
+options=('!debug')
+install=netscan.install
+source=("$_name::git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_name"
+  local version
+  version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+  printf '%s.r%s.g%s' "$version" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+  cd "$_name"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$_name"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$_name"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo test --frozen --release
+}
+
+package() {
+  cd "$_name"
+  install -Dm755 target/release/netscan -t "$pkgdir/usr/bin/"
+  install -Dm644 assets/netscan.desktop -t "$pkgdir/usr/share/applications/"
+  install -Dm644 assets/netscan.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/netscan.svg"
+  install -Dm644 README.md -t "$pkgdir/usr/share/doc/$pkgname/"
+}

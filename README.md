@@ -46,13 +46,41 @@ To launch it from anywhere, copy the binary onto your `PATH`:
 cp target/release/netscan ~/.local/bin/
 ```
 
+## Installing on Arch Linux
+
+The quickest way in is the prebuilt package from the
+[latest release](https://github.com/jajardinero/ipscanner-rust/releases/latest):
+
+```sh
+sudo pacman -U netscan-0.1.0-1-x86_64.pkg.tar.zst
+```
+
+To build it yourself, two PKGBUILDs live in `packaging/arch/`:
+
+| Package       | Builds                    |
+|---------------|---------------------------|
+| `netscan`     | the latest tagged release |
+| `netscan-git` | the latest commit on main |
+
+```sh
+cd packaging/arch/netscan      # or packaging/arch/netscan-git
+makepkg -si
+```
+
+Either one installs the binary, a desktop launcher entry and an icon. Then start **NetScan** from
+your app launcher, or run `netscan` in a terminal.
+
+If you installed Rust with rustup instead of pacman, `makepkg` won't recognise `cargo` as
+installed. Either install the `rustup` package (`sudo pacman -S rustup`) or skip the dependency
+check with `makepkg -id`.
+
 ## Faster scans (optional)
 
 With the `CAP_NET_RAW` capability, NetScan first does a raw ARP sweep of local subnets. It then
 marks silent addresses as down straight away, without waiting for ping timeouts:
 
 ```sh
-sudo setcap cap_net_raw+ep target/release/netscan
+sudo setcap cap_net_raw+ep target/release/netscan   # or /usr/bin/netscan if installed from the package
 ```
 
 Apply it to whichever copy of the binary you run. Rebuilding or copying the binary drops the

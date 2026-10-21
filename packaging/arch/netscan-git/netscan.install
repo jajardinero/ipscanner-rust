@@ -1,0 +1,15 @@
+_raw_arp_hint() {
+  echo "==> NetScan runs as a normal user. For faster scans with a raw ARP sweep, grant:"
+  echo "      sudo setcap cap_net_raw+ep /usr/bin/netscan"
+  echo "    This lets every user who can run netscan send raw packets."
+}
+
+post_install() {
+  _raw_arp_hint
+}
+
+post_upgrade() {
+  # Replacing the binary drops any file capability set on the old one.
+  echo "==> Upgrading replaced /usr/bin/netscan; re-run setcap if you had granted CAP_NET_RAW."
+  _raw_arp_hint
+}

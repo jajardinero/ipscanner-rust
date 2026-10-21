@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=NetScan
+GenericName=Network Scanner
+Comment=Find devices on your local network and the services they offer
+Exec=netscan
+Icon=netscan
+Terminal=false
+Categories=Network;Monitor;
+Keywords=ip;scanner;lan;network;arp;ping;mac;port;
+StartupWMClass=netscan
